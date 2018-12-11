@@ -1,0 +1,42 @@
+{
+  "name": "rollup-plugin-smart-asset",
+  "version": "1.0.0",
+  "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
+  "main": "dist/rollup-plugin-smart-asset.cjs.js",
+  "jsnext:main": "dist/rollup-plugin-smart-asset.es.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "eslint": "eslint 'src/**/*.js'",
+    "mocha": "mocha --require @babel/register || true",
+    "rollup": "rollup -c",
+    "test": "npm run eslint && npm run mocha",
+    "build": "npm run rollup",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sormy/rollup-plugin-smart-asset.git"
+  },
+  "author": "Artem Butusov <art.sormy@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sormy/rollup-plugin-smart-asset/issues"
+  },
+  "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
+  "dependencies": {
+    "asset-hash": "^2.2.5",
+    "fs-extra": "^7.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/register": "^7.0.0",
+    "acorn": "^6.0.4",
+    "chai": "^4.2.0",
+    "eslint": "^5.9.0",
+    "mocha": "^5.2.0",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.67.4",
+    "rollup-plugin-babel": "^4.0.3"
+  }
+}
