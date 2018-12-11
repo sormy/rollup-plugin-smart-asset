@@ -56,6 +56,7 @@ export default {
 - port remaining options from `postcss-smart-asset`
 - test different rollup output options
 - custom asset name
+- fix source maps, binary files are included in source maps as of now
 
 PRs are very welcome!
 
