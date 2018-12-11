@@ -4,7 +4,11 @@ import { copy } from "fs-extra"
 import { getHash } from "asset-hash"
 
 function getPublicPathPrefix(publicPath) {
-  if (publicPath === "" || publicPath === false || publicPath === undefined || publicPath === null) {
+  if (publicPath === ""
+    || publicPath === false
+    || publicPath === undefined
+    || publicPath === null
+  ) {
     return ""
   }
   return publicPath.substr(-1) === "/" ? publicPath : publicPath + "/"
@@ -38,7 +42,7 @@ export default (initialOptions = {}) => {
         if (options.useHash) {
           const assetHash = await getHash(id, options.hashOptions)
           assetName = options.keepName
-            ? modulePath.name + "-" + assetHash + modulePath.ext
+            ? modulePath.name + "_" + assetHash + modulePath.ext
             : assetHash + modulePath.ext
         } else {
           assetName = modulePath.name + modulePath.ext

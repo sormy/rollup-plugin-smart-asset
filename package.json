@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "main": "dist/rollup-plugin-smart-asset.cjs.js",
   "jsnext:main": "dist/rollup-plugin-smart-asset.es.js",
