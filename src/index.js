@@ -102,7 +102,7 @@ export default (initialOptions = {}) => {
           assetsToCopy.push({ assetName: assetName, fileName: id })
           value = getPublicPathPrefix(options.publicPath) + assetName
         } else { // rebase
-          value = relative(options.rebasePath, id)
+          value = getPublicPathPrefix(options.publicPath) + relative(options.rebasePath, id)
         }
 
         const code = `export default ${JSON.stringify(value)}`

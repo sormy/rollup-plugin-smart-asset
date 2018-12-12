@@ -38,6 +38,12 @@ test("transform(), rebase mode, uses rebasePath", async () => {
   expect(result).toEqual({ code: "export default \"test/assets/test.png\"" })
 })
 
+test("transform(), rebase mode, uses publicPath", async () => {
+  const options = { url: "rebase", extensions: [".png"], rebasePath: "node_modules", publicPath: "/vendor" }
+  const result = await smartAsset(options).transform(undefined, "node_modules/test/assets/test.png")
+  expect(result).toEqual({ code: "export default \"/vendor/test/assets/test.png\"" })
+})
+
 test("transform(), inline mode, returns inlined url as exports", async () => {
   statMock.mockImplementation((path, callback) => callback(null, { size: 1024 }))
   readFileMock.mockImplementation((path, callback) => callback(null, Buffer.from("text")))

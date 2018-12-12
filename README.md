@@ -48,6 +48,8 @@ General options:
 
 `rebase` options:
 
+- `publicPath`: Reference file from JS using this path, relative to html page
+  where asset is referenced. Could be relative, absolute or CDN.
 - `rebasePath`: Rebase all asset urls to this directory, defaults to current directory.
 
 `inline` options:
