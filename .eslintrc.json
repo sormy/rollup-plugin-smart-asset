@@ -6,11 +6,12 @@
   },
   "env": {
     "es6": true,
-    "mocha": true,
+    "jest": true,
     "node": true
   },
   "rules": {
     "semi": ["error", "never"],
-    "quotes": ["error", "double"]
+    "quotes": ["error", "double"],
+    "comma-dangle": ["error", "always-multiline"]
   }
 }

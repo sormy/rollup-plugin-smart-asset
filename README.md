@@ -1,6 +1,6 @@
 # Rollup Smart Asset Plugin
 
-## About
+## Overview
 
 Rollup plugin to rebase, inline or copy assets referenced from the code.
 
@@ -8,8 +8,8 @@ NOTE: only **copy** is implemented as of now.
 
 Inspired by:
 
-- https://github.com/sebastian-software/postcss-smart-asset
-- https://github.com/rollup/rollup-plugin-url
+- <https://github.com/sebastian-software/postcss-smart-asset>
+- <https://github.com/rollup/rollup-plugin-url>
 
 `postcss-smart-asset` works well when you need to bundle assets referenced from css,
 but doesn't work for JS assets.
@@ -17,7 +17,8 @@ but doesn't work for JS assets.
 `rollup-plugin-url` has fewer options than `postcss-smart-asset`, doesn't work
 as rollup transform and has LGPL 3 license (as of 2018/12/04).
 
-This plugin is targeting to do the same as `postcss-smart-asset` for JS but with MIT license.
+This plugin is doing the same as `rollup-plugin-url` in the way
+`postcss-smart-asset` works for imports from JavaScript with MIT license.
 
 ## Usage
 
@@ -41,22 +42,27 @@ export default {
 
 ## Configuration
 
-- `publicPath`: reference file from JS using this path, relative to html page
-  where asset is referenced
-- `assetsPath`: copy assets to this directory, relative to rollup output
-- `useHash`: use hash instead of filename, default to `false`
-- `keepName`: use both hash and name (`[name]-[hash][ext]`) if `useHash` is true,
-  default to `false`
-- `hashOptions`: ...
-- `extensions`: what file extensions to process, defaults to `.gif`, `.png`, `.jpg`
+- `publicPath`: Reference file from JS using this path, relative to html page
+  where asset is referenced.
+- `assetsPath`: Copy assets to this directory, relative to rollup output.
+- `useHash`: Use `[hash][ext]` instead of default `[name][ext]`
+- `keepName`: Use both hash and name `[name]-[hash][ext]` if `useHash` is `true`
+- `nameFormat`: Use custom name format using these patterns `[name]`, `[ext]`,
+  `[hash]`.
+- `hashOptions`: See more: <https://github.com/sebastian-software/asset-hash>
+  - `hash`: Any valid hashing algorithm e.g. `metrohash128` (default), `metrohash64`,
+    `xxhash64`, `xxhash32`, `sha1`, `md5`, ...
+  - `encoding`: Any valid encoding for built-in digests `hex`, `base64`, `base62`, ...
+  - `maxLength`: Maximum length of returned digest. Keep in mind that reducing it
+    increases collison probability.
+- `extensions`: What file extensions to process, defaults to
+  `[".svg", ".gif", ".png", ".jpg"]`
 
 ## TODO
 
-- unit tests
 - port remaining options from `postcss-smart-asset`
 - test different rollup output options
-- custom asset name
-- fix source maps, binary files are included in source maps as of now
+- fix source maps
 
 PRs are very welcome!
 
