@@ -3,9 +3,9 @@ import babel from "rollup-plugin-babel"
 export default {
 	input: "src/index.js",
   plugins: [ babel() ],
-  external: [ "path", "asset-hash", "fs-extra" ],
+  external: [ "path", "asset-hash", "fs-extra", "util", "fs", "mime" ],
 	output: [
 		{ file: "dist/rollup-plugin-smart-asset.cjs.js", format: "cjs" },
 		{ file: "dist/rollup-plugin-smart-asset.es.js", format: "es" },
-	]
+	],
 }
