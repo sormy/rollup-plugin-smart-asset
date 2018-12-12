@@ -4,8 +4,6 @@
 
 Rollup plugin to rebase, inline or copy assets referenced from the code.
 
-NOTE: only **copy** is implemented as of now.
-
 Inspired by:
 
 - <https://github.com/sebastian-software/postcss-smart-asset>
@@ -42,8 +40,24 @@ export default {
 
 ## Configuration
 
+General options:
+
+- `url`: Mode: `rebase` (default), `inline` or `copy`.
+- `extensions`: What file extensions to process, defaults to
+  `[".svg", ".gif", ".png", ".jpg"]`
+
+`rebase` options:
+
+- `rebasePath`: Rebase all asset urls to this directory, defaults to current directory.
+
+`inline` options:
+
+- `maxSize`: Max file size to inline, fallback is `copy` mode, defaults to `14` kbytes.
+
+`copy` options:
+
 - `publicPath`: Reference file from JS using this path, relative to html page
-  where asset is referenced.
+  where asset is referenced. Could be relative, absolute or CDN.
 - `assetsPath`: Copy assets to this directory, relative to rollup output.
 - `useHash`: Use `[hash][ext]` instead of default `[name][ext]`
 - `keepName`: Use both hash and name `[name]-[hash][ext]` if `useHash` is `true`
@@ -55,14 +69,12 @@ export default {
   - `encoding`: Any valid encoding for built-in digests `hex`, `base64`, `base62`, ...
   - `maxLength`: Maximum length of returned digest. Keep in mind that reducing it
     increases collison probability.
-- `extensions`: What file extensions to process, defaults to
-  `[".svg", ".gif", ".png", ".jpg"]`
 
 ## TODO
 
-- port remaining options from `postcss-smart-asset`
+- port remaining options from `postcss-smart-asset` and `rollup-plugin-url`
 - test different rollup output options
-- fix source maps
+- fix source maps?
 
 PRs are very welcome!
 
