@@ -43,7 +43,7 @@ async function getAssetName(fileName, options) {
     const hash = await getHash(fileName, options.hashOptions)
 
     return options.keepName
-      ? modulePath.name + "_" + hash + modulePath.ext
+      ? modulePath.name + "~" + hash + modulePath.ext
       : hash + modulePath.ext
   }
 

@@ -143,7 +143,7 @@ test("load(), copy mode, uses keepName", async () => {
   const result = await smartAsset(options).load("test.png")
 
   expect(getHashMock).toBeCalledWith("test.png", {})
-  expect(result).toEqual(`${idComment}\nexport default "test_0123456789.png"`)
+  expect(result).toEqual(`${idComment}\nexport default "test~0123456789.png"`)
 })
 
 test("load(), copy mode, uses nameFormat without hash", async () => {
