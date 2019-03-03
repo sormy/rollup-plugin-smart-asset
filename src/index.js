@@ -129,7 +129,7 @@ export default (initialOptions = {}) => {
       const alreadyProcessed = code.startsWith(idComment)
 
       if (!alreadyProcessed) {
-        const newCode = plugin.load.call(this, id)
+        const newCode = await plugin.load.call(this, id)
 
         if (newCode) {
           if (options.sourceMap) {
