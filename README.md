@@ -68,7 +68,7 @@ Output:
 // without keepImport
 export default "public_path_to_asset"
 // with keepImport
-export default require("relate_path_to_asset_from_bundle")
+export default require("relative_path_to_asset_from_bundle")
 ```
 
 Options:
@@ -106,7 +106,7 @@ Output:
 // without keepImport
 export default "public_path_to_asset"
 // with keepImport
-export default require("relate_path_to_asset_from_bundle")
+export default require("relative_path_to_asset_from_bundle")
 // + file is copied to target directory
 ```
 
