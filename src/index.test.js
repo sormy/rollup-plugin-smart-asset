@@ -192,7 +192,7 @@ test("transform() calls load()", async () => {
   plugin.load = loadMock
   const result = await plugin.transform("anything", "test.png")
 
-  expect(result).toEqual("stub")
+  expect(result.code).toEqual("stub")
   expect(loadMock).toBeCalledWith("test.png")
 })
 

@@ -1,7 +1,15 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
+  "keywords": [
+    "rollup-plugin",
+    "asset",
+    "rebase",
+    "url",
+    "copy",
+    "inline"
+  ],
   "main": "dist/rollup-plugin-smart-asset.cjs.js",
   "jsnext:main": "dist/rollup-plugin-smart-asset.esm.js",
   "module": "dist/rollup-plugin-smart-asset.esm.js",
@@ -26,6 +34,7 @@
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
     "asset-hash": "^2.2.5",
+    "magic-string": "^0.25.2",
     "mime": "^2.4.0",
     "mkdirp": "^0.5.1"
   },

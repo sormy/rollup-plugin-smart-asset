@@ -4,21 +4,6 @@
 
 Rollup plugin to rebase, inline or copy assets referenced from the JavaScript code.
 
-Inspired by:
-
-- <https://github.com/sebastian-software/postcss-smart-asset>
-- <https://github.com/rollup/rollup-plugin-url>
-
-## Alternatives
-
-`postcss-smart-asset` works well when you need to bundle assets referenced from
-CSS, but doesn't work for assets imported from JavaScript.
-
-`rollup-plugin-url` has fewer options, doesn't work if asset is already loaded
-by another plugin (by sourcemaps, for example) and, what is most important, has
-non permissive license (as of 2018-03-02). This plugin has also `keepImport`
-feature that is not available in `rollup-plugin-url`.
-
 ## Usage
 
 ```js
@@ -78,6 +63,7 @@ Options:
 - `rebasePath`: Rebase all asset urls to this directory, defaults to current directory.
 - `keepImport`: Keep import, so consumer of your package could define their own
   bundle configuration.
+- `sourceMap`: Set to `true` to keep source map.
 
 ## Mode: inline
 
@@ -128,11 +114,35 @@ Options:
 - `keepImport`: Keep import, so consumer of your package could define their own
   bundle configuration.
 
+## Alternatives
+
+## rollup-plugin-url
+
+<https://github.com/rollup/rollup-plugin-url>
+
+`rollup-plugin-url` has fewer options, doesn't work if asset is already loaded
+by another plugin (by sourcemaps, for example) and, what is most important, has
+non permissive license (as of 2018-03-02). This plugin has also `keepImport`
+feature that is not available in `rollup-plugin-url`.
+
+## postcss-smart-asset
+
+<https://github.com/sebastian-software/postcss-smart-asset>
+
+`postcss-smart-asset` works well when you need to bundle assets referenced from
+CSS, but doesn't work for assets imported from JavaScript.
+
+## rollup-plugin-rebase
+
+<https://github.com/sebastian-software/rollup-plugin-rebase>
+
+`rollup-plugin-rebase` designed for libraries, not applications. This plugin
+designed for all use cases.
+
 ## TODO
 
 - port remaining options from `postcss-smart-asset` and `rollup-plugin-url`
 - test different rollup output options
-- fix sourcemaps in the case when plugin executed in `transform()` hook
 
 ## Contribution
 

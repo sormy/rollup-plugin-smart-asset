@@ -5,6 +5,7 @@ import { join, extname, dirname, parse, relative } from "path"
 import mkdirp from "mkdirp"
 import { getHash } from "asset-hash"
 import { getType } from "mime"
+import MagicString from "magic-string"
 
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
@@ -69,6 +70,7 @@ export default (initialOptions = {}) => {
     nameFormat: null,   // valid patterns: [name] | [ext] | [hash]
     hashOptions: {},    // any valid asset-hash options
     keepImport: false,  // keeps import to let another bundler to process the import
+    sourceMap: false,   // add source map if transform() hook is invoked
     extensions: [       // list of extensions to process by this plugin
       ".svg",
       ".gif",
@@ -122,12 +124,28 @@ export default (initialOptions = {}) => {
     },
 
     // some plugins could load asset content before this plugin's load() hook
-    // hook to be not executed for this plugin, but transform() hook works even
-    // in that case
+    // will never be executed, but transform() hook works even in that case
     async transform(code, id) {
       const alreadyProcessed = code.startsWith(idComment)
+
       if (!alreadyProcessed) {
-        return plugin.load.call(this, id)
+        const newCode = plugin.load.call(this, id)
+
+        if (newCode) {
+          if (options.sourceMap) {
+            const magicString = new MagicString(code)
+            magicString.overwrite(0, code.length - 1, newCode)
+            return {
+              code: magicString.toString(),
+              map: magicString.generateMap({ hires: true }),
+            }
+          } else {
+            return {
+              code: newCode,
+              map: { mappings: "" },
+            }
+          }
+        }
       }
     },
 
