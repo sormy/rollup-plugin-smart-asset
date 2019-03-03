@@ -1,8 +1,8 @@
 import { promisify } from "util"
-import { stat, readFile } from "fs"
+import { stat, readFile, copyFileSync } from "fs"
 import { join, extname, dirname, parse, relative } from "path"
 
-import { copy } from "fs-extra"
+import mkdirp from "mkdirp"
 import { getHash } from "asset-hash"
 import { getType } from "mime"
 
@@ -20,11 +20,17 @@ function getPublicPathPrefix(publicPath) {
     : ""
 }
 
+function getImportPathPrefix(assetsPath) {
+  return "." + (assetsPath ? "/" + assetsPath : "") + "/"
+}
+
 async function getAssetName(fileName, options) {
   const modulePath = parse(fileName)
 
   if (options.nameFormat) {
-    const hash = await getHash(fileName, options.hashOptions)
+    const hash = /\[hash\]/.test(options.nameFormat)
+      ? await getHash(fileName, options.hashOptions)
+      : ""
 
     return options.nameFormat
       .replace(/\[name\]/g, modulePath.name)
@@ -53,24 +59,16 @@ async function detectOpMode(fileName, options) {
 
 export default (initialOptions = {}) => {
   const defaultOptions = {
-    // choose mode
-    url: "rebase",      // "rebase" | "inline" | "copy"
-
-    // rebase mode
+    url: "rebase",      // choose mode: "rebase" | "inline" | "copy"
     rebasePath: ".",    // rebase all asset urls to this directory
-
-    // inline mode
     maxSize: 14,        // max size in kbytes that will be inlined, fallback is copy
-
-    // copy mode
-    publicPath: false,  // relative to html page where asset is referenced
-    assetsPath: false,  // relative to rollup output
+    publicPath: null,   // relative to html page where asset is referenced
+    assetsPath: null,   // relative to rollup output
     useHash: false,     // alias for nameFormat: [hash][ext]
     keepName: false,    // alias for nameFormat: [name]_[hash][ext] (requires useHash)
-    nameFormat: false,  // valid patterns: [name] | [ext] | [hash]
+    nameFormat: null,   // valid patterns: [name] | [ext] | [hash]
     hashOptions: {},    // any valid asset-hash options
-
-    // all modes
+    keepImport: false,  // keeps import to let another bundler to process the import
     extensions: [       // list of extensions to process by this plugin
       ".svg",
       ".gif",
@@ -81,12 +79,14 @@ export default (initialOptions = {}) => {
 
   const options = Object.assign({}, defaultOptions, initialOptions)
 
+  const idComment = "/* loaded by smart-asset */"
+
   let assetsToCopy = []
 
-  return {
+  const plugin = {
     name: "smart-asset",
 
-    async transform(source, id) {
+    async load(id) {
       if (moduleMatchesExtensions(id, options.extensions)) {
         const mode = await detectOpMode(id, options)
 
@@ -100,25 +100,59 @@ export default (initialOptions = {}) => {
         } else if (mode === "copy") {
           const assetName = await getAssetName(id, options)
           assetsToCopy.push({ assetName: assetName, fileName: id })
-          value = getPublicPathPrefix(options.publicPath) + assetName
-        } else { // rebase
-          value = getPublicPathPrefix(options.publicPath) + relative(options.rebasePath, id)
+          value = options.keepImport
+            ? getImportPathPrefix(options.assetsPath) + assetName
+            : getPublicPathPrefix(options.publicPath) + assetName
+        } else if (mode === "rebase") {
+          const assetName = relative(options.rebasePath, id)
+          value = options.keepImport
+            ? "./" + assetName
+            : getPublicPathPrefix(options.publicPath) + assetName
+        } else {
+          this.warn(`Invalid mode: ${mode}`)
+          return
         }
 
-        const code = `export default ${JSON.stringify(value)}`
+        const code = options.keepImport && (mode === "copy" || mode === "rebase")
+          ? `${idComment}\nexport default require(${JSON.stringify(value)})`
+          : `${idComment}\nexport default ${JSON.stringify(value)}`
 
-        return { code }
+        return code
       }
     },
 
-    async generateBundle(outputOptions, bundle, isWrite) {
+    // some plugins could load asset content before this plugin's load() hook
+    // hook to be not executed for this plugin, but transform() hook works even
+    // in that case
+    async transform(code, id) {
+      const alreadyProcessed = code.startsWith(idComment)
+      if (!alreadyProcessed) {
+        return plugin.load.call(this, id)
+      }
+    },
+
+    generateBundle(outputOptions, bundle, isWrite) {
       if (isWrite && assetsToCopy.length) {
         const assetsRootPath = join(dirname(outputOptions.file), options.assetsPath || "")
 
+        let dirInitialized = false
+
         for (const asset of assetsToCopy) {
           const assetPath = join(assetsRootPath, asset.assetName)
+
+          // since all assets are going to the same directory it is enough to
+          // create directory only once and free IOPS for more valuable things
           try {
-            await copy(asset.fileName, assetPath)
+            if (!dirInitialized) {
+              mkdirp(dirname(assetPath))
+              dirInitialized = true
+            }
+          } catch (e) {
+            this.warn(`Unable to create directory: ${dirname(assetPath)}`)
+          }
+
+          try {
+            copyFileSync(asset.fileName, assetPath)
           } catch (e) {
             this.warn(`Unable to copy asset: ${asset.fileName}`)
           }
@@ -128,4 +162,6 @@ export default (initialOptions = {}) => {
       }
     },
   }
+
+  return plugin
 }

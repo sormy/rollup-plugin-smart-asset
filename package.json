@@ -1,17 +1,18 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "main": "dist/rollup-plugin-smart-asset.cjs.js",
-  "jsnext:main": "dist/rollup-plugin-smart-asset.es.js",
+  "jsnext:main": "dist/rollup-plugin-smart-asset.esm.js",
+  "module": "dist/rollup-plugin-smart-asset.esm.js",
   "scripts": {
     "clean": "rimraf dist",
-    "eslint": "eslint 'src/**/*.js'",
+    "eslint": "eslint 'src/**/*.js' '*.js'",
     "jest": "jest --coverage",
     "rollup": "rollup -c",
     "test": "npm run eslint && npm run jest",
     "build": "npm run rollup",
-    "prepublishOnly": "npm test && npm run build"
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
@@ -25,18 +26,18 @@
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
     "asset-hash": "^2.2.5",
-    "fs-extra": "^7.0.1",
-    "mime": "^2.4.0"
+    "mime": "^2.4.0",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
     "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.1.0",
     "chai": "^4.2.0",
     "eslint": "^5.9.0",
-    "jest": "^23.6.0",
+    "jest": "^24.1.0",
     "rimraf": "^2.6.2",
     "rollup": "^0.67.4",
     "rollup-plugin-babel": "^4.0.3"

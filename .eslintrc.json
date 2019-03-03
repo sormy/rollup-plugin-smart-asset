@@ -10,6 +10,7 @@
     "node": true
   },
   "rules": {
+    "no-tabs": "error",
     "semi": ["error", "never"],
     "quotes": ["error", "double"],
     "comma-dangle": ["error", "always-multiline"]
