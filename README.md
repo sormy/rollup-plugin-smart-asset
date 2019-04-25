@@ -108,7 +108,8 @@ Options:
 - `hashOptions`: See more: <https://github.com/sebastian-software/asset-hash>
   - `hash`: Any valid hashing algorithm e.g. `metrohash128` (default), `metrohash64`,
     `xxhash64`, `xxhash32`, `sha1`, `md5`, ...
-  - `encoding`: Any valid encoding for built-in digests `hex`, `base64`, `base62`, ...
+  - `encoding`: Any valid encoding for built-in digests `hex`, `base64`, `base62`
+    (default), ...
   - `maxLength`: Maximum length of returned digest. Keep in mind that reducing it
     increases collison probability.
 - `keepImport`: Keep import, so consumer of your package could define their own
@@ -143,6 +144,9 @@ designed for all use cases.
 
 - port remaining options from `postcss-smart-asset` and `rollup-plugin-url`
 - test different rollup output options
+  - multiple inputs
+  - multiple outputs
+  - source as dir/name
 
 ## Contribution
 

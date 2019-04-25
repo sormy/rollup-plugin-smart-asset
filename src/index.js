@@ -2,7 +2,7 @@ import { promisify } from "util"
 import { stat, readFile, copyFileSync } from "fs"
 import { join, extname, dirname, parse, relative } from "path"
 
-import mkdirp from "mkdirp"
+import { sync as mkdirpSync } from "mkdirp"
 import { getHash } from "asset-hash"
 import { getType } from "mime"
 import MagicString from "magic-string"
@@ -162,7 +162,7 @@ export default (initialOptions = {}) => {
           // create directory only once and free IOPS for more valuable things
           try {
             if (!dirInitialized) {
-              mkdirp(dirname(assetPath))
+              mkdirpSync(dirname(assetPath))
               dirInitialized = true
             }
           } catch (e) {

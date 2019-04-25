@@ -1,5 +1,5 @@
 jest.mock("fs", () => ({ readFile: jest.fn(), stat: jest.fn(), copyFileSync: jest.fn() }))
-jest.mock("mkdirp", () => jest.fn())
+jest.mock("mkdirp", () => ({ sync: jest.fn() }))
 jest.mock("asset-hash", () => ({ getHash: jest.fn() }))
 
 import {
@@ -10,7 +10,7 @@ import {
 
 import { getHash as getHashMock } from "asset-hash"
 
-import mkdirpMock from "mkdirp"
+import { sync as mkdirpSyncMock } from "mkdirp"
 
 import smartAsset from "."
 
@@ -218,8 +218,8 @@ test("generateBundle(), copy mode, copies assets", async () => {
   plugin.generateBundle(outputOptions, {}, true)
   plugin.generateBundle(outputOptions, {}, true) // should be ignored
 
-  expect(mkdirpMock).toBeCalledTimes(1)
-  expect(mkdirpMock).toBeCalledWith("dist")
+  expect(mkdirpSyncMock).toBeCalledTimes(1)
+  expect(mkdirpSyncMock).toBeCalledWith("dist")
 
   expect(copyFileSyncMock).toBeCalledTimes(2)
   expect(copyFileSyncMock).nthCalledWith(1, "test1.png", "dist/test1.png")
@@ -267,7 +267,7 @@ test("generateBundle(), copy mode, warn on copy error", async () => {
 })
 
 test("generateBundle(), copy mode, warn on directory creation error", async () => {
-  mkdirpMock.mockImplementation(() => { throw new Error() })
+  mkdirpSyncMock.mockImplementation(() => { throw new Error() })
 
   const options = { url: "copy", extensions: [".png"] }
   const outputOptions = { file: "dist/bundle.js" }
