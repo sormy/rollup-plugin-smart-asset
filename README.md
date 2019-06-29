@@ -143,10 +143,6 @@ designed for all use cases.
 ## TODO
 
 - port remaining options from `postcss-smart-asset` and `rollup-plugin-url`
-- test different rollup output options
-  - multiple inputs
-  - multiple outputs
-  - source as dir/name
 
 ## Contribution
 

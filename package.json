@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "keywords": [
     "rollup-plugin",
@@ -33,23 +33,22 @@
   },
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
-    "asset-hash": "^2.2.5",
+    "asset-hash": "^2.4.3",
     "magic-string": "^0.25.2",
-    "mime": "^2.4.0",
+    "mime": "^2.4.4",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/register": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^24.1.0",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "babel-jest": "^24.8.0",
     "chai": "^4.2.0",
-    "eslint": "^5.9.0",
-    "jest": "^24.1.0",
+    "eslint": "^5.16.0",
+    "jest": "^24.8.0",
     "rimraf": "^2.6.2",
     "rollup": "^0.67.4",
-    "rollup-plugin-babel": "^4.0.3"
+    "rollup-plugin-babel": "^4.3.3"
   },
   "peerDependencies": {
     "rollup": ">0.60"

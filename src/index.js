@@ -151,7 +151,8 @@ export default (initialOptions = {}) => {
 
     generateBundle(outputOptions, bundle, isWrite) {
       if (isWrite && assetsToCopy.length) {
-        const assetsRootPath = join(dirname(outputOptions.file), options.assetsPath || "")
+        const outputDir = outputOptions.dir ? outputOptions.dir : dirname(outputOptions.file)
+        const assetsRootPath = join(outputDir, options.assetsPath || "")
 
         let dirInitialized = false
 

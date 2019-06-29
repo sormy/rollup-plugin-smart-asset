@@ -207,9 +207,28 @@ test("transform() doesn't call load() if content was loaded by this plugin", asy
   expect(loadMock).not.toBeCalled()
 })
 
-test("generateBundle(), copy mode, copies assets", async () => {
+test("generateBundle(), copy mode, copies assets, file is used", async () => {
   const options = { url: "copy", extensions: [".png"] }
   const outputOptions = { file: "dist/bundle.js" }
+
+  const plugin = smartAsset(options)
+
+  await plugin.load("test1.png")
+  await plugin.load("test2.png")
+  plugin.generateBundle(outputOptions, {}, true)
+  plugin.generateBundle(outputOptions, {}, true) // should be ignored
+
+  expect(mkdirpSyncMock).toBeCalledTimes(1)
+  expect(mkdirpSyncMock).toBeCalledWith("dist")
+
+  expect(copyFileSyncMock).toBeCalledTimes(2)
+  expect(copyFileSyncMock).nthCalledWith(1, "test1.png", "dist/test1.png")
+  expect(copyFileSyncMock).nthCalledWith(2, "test2.png", "dist/test2.png")
+})
+
+test("generateBundle(), copy mode, copies assets, dir is used", async () => {
+  const options = { url: "copy", extensions: [".png"] }
+  const outputOptions = { dir: "dist" }
 
   const plugin = smartAsset(options)
 
