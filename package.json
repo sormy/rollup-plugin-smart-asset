@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
-    "asset-hash": "^2.4.3",
+    "asset-hash": "^3.0.2",
     "magic-string": "^0.25.2",
     "mime": "^2.4.4",
     "mkdirp": "^0.5.1"
