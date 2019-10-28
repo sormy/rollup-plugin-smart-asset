@@ -3,9 +3,10 @@ import { stat, readFile, copyFileSync } from "fs"
 import { join, extname, dirname, parse, relative } from "path"
 
 import { sync as mkdirpSync } from "mkdirp"
-import { getHash } from "asset-hash"
 import { getType } from "mime"
 import MagicString from "magic-string"
+
+import { getHash } from "./get-hash"
 
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)

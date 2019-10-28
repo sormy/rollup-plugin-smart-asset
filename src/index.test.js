@@ -1,6 +1,6 @@
 jest.mock("fs", () => ({ readFile: jest.fn(), stat: jest.fn(), copyFileSync: jest.fn() }))
 jest.mock("mkdirp", () => ({ sync: jest.fn() }))
-jest.mock("asset-hash", () => ({ getHash: jest.fn() }))
+jest.mock("./get-hash", () => ({ getHash: jest.fn() }))
 
 import {
   readFile as readFileMock,
@@ -8,7 +8,7 @@ import {
   copyFileSync as copyFileSyncMock,
 } from "fs"
 
-import { getHash as getHashMock } from "asset-hash"
+import { getHash as getHashMock } from "./get-hash"
 
 import { sync as mkdirpSyncMock } from "mkdirp"
 
