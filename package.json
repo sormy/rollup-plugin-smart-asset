@@ -1,5 +1,5 @@
 {
-  "name": "rollup-plugin-smart-asset",
+  "name": "rollup-plugin-smart-asset-transitive-bullshit",
   "version": "1.1.5",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "keywords": [

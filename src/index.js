@@ -3,7 +3,7 @@ import { stat, readFile, copyFileSync } from "fs"
 import { join, extname, dirname, parse, relative } from "path"
 
 import { sync as mkdirpSync } from "mkdirp"
-import { getType } from "mime"
+import mime from "mime"
 import MagicString from "magic-string"
 
 import { getHash } from "./get-hash"
@@ -98,8 +98,8 @@ export default (initialOptions = {}) => {
         if (mode === "inline") {
           const content = await readFileAsync(id)
           const base64 = content.toString("base64")
-          const mime = getType(id)
-          value = `data:${mime};base64,${base64}`
+          const mimeType = mime.getType(id)
+          value = `data:${mimeType};base64,${base64}`
         } else if (mode === "copy") {
           const assetName = await getAssetName(id, options)
           assetsToCopy.push({ assetName: assetName, fileName: id })
