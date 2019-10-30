@@ -7,15 +7,15 @@ Rollup plugin to rebase, inline or copy assets referenced from the JavaScript co
 ## Usage
 
 ```js
-import smartAsset from 'rollup-plugin-smart-asset'
+import smartAsset from "rollup-plugin-smart-asset"
 
 const smartAssetOpts = { ... }
 
 export default {
-  input: 'src/index.tsx',
+  input: "src/index.tsx",
   output: {
-    file: 'dist/index.js',
-    format: 'iife'
+    file: "dist/index.js",
+    format: "iife"
   },
   plugins: [
     ...
@@ -101,19 +101,44 @@ Options:
 - `publicPath`: Reference file from JS using this path, relative to html page
   where asset is referenced. Could be relative, absolute or CDN.
 - `assetsPath`: Copy assets to this directory, relative to rollup output.
-- `useHash`: Use `[hash][ext]` instead of default `[name][ext]`
-- `keepName`: Use both hash and name `[name]-[hash][ext]` if `useHash` is `true`
+- `useHash`: Use `[hash][ext]` instead of default `[name][ext]`.
+- `keepName`: Use both hash and name `[name]~[hash][ext]` if `useHash` is `true`.
 - `nameFormat`: Use custom name format using these patterns `[name]`, `[ext]`,
   `[hash]`.
-- `hashOptions`: See more: <https://github.com/sebastian-software/asset-hash>
-  - `hash`: Any valid hashing algorithm e.g. `metrohash128` (default), `metrohash64`,
-    `xxhash64`, `xxhash32`, `sha1`, `md5`, ...
-  - `encoding`: Any valid encoding for built-in digests `hex`, `base64`, `base62`
-    (default), ...
-  - `maxLength`: Maximum length of returned digest. Keep in mind that reducing it
-    increases collison probability.
+- `hashOptions`: Hash options.
+  - `hash`: Any valid Node's crypto hashing algorithm e.g. `sha1`, `md5` etc,
+    Hash-like class (see: https://nodejs.org/api/crypto.html#crypto_class_hash),
+    `metrohash64` or `metrohash128` if `metrohash` is installed,
+    `xxhash32` or `xxhash64` if `xxhash` is installed.
+    Default is `sha1`.
+  - `encoding`: Hash encoding `hex`, `base64` `base62`, `base58`, `base52`,
+    `base49`, `base36`, `base32`, `base26`. Default is `base52`.
+  - `maxLength`: Maximum length of returned digest. Keep in mind that
+    reducing it increases collison probability. Default is `8`.
 - `keepImport`: Keep import, so consumer of your package could define their own
   bundle configuration.
+
+## Migration
+
+### Migration from v1.x to v2.x
+
+Changes:
+
+- Option `hashOptions.hash` defaults to `sha1` instead of `metrohash128`.
+- Removed dependencies: `asset-hash`.
+- These dependencies are now optional: `xxhash` and `metrohash`.
+
+The default configuration is changed in favor of default hash functions
+that are available in NodeJS without requirement to build any native
+extensions during `npm install`.
+
+If you would like to use ultra fast `metrohash64` or `metrohash128` hashes
+then do `npm install metrohash` and set `hashOptions.hash` to `metrohash64`
+or `metrohash128`.
+
+If you would like to use ultra fast `xxhash32` or `xxhash64` hashes
+then do `npm install xxhash` and set `hashOptions.hash` to `xxhash32`
+or `xxhash64`.
 
 ## Alternatives
 
@@ -122,27 +147,22 @@ Options:
 <https://github.com/rollup/rollup-plugin-url>
 
 `rollup-plugin-url` has fewer options, doesn't work if asset is already loaded
-by another plugin (by sourcemaps, for example) and, what is most important, has
-non permissive license (as of 2018-03-02). This plugin has also `keepImport`
-feature that is not available in `rollup-plugin-url`.
+by another plugin (by sourcemaps, for example) and doesn't have `keepImport`
+like option.
 
 ## postcss-smart-asset
 
 <https://github.com/sebastian-software/postcss-smart-asset>
 
-`postcss-smart-asset` works well when you need to bundle assets referenced from
-CSS, but doesn't work for assets imported from JavaScript.
+`postcss-smart-asset` works for assets referenced from CSS, but doesn't work for
+assets imported from JavaScript.
 
 ## rollup-plugin-rebase
 
 <https://github.com/sebastian-software/rollup-plugin-rebase>
 
-`rollup-plugin-rebase` designed for libraries, not applications. This plugin
+`rollup-plugin-rebase` designed for libraries, not for applications. This plugin
 designed for all use cases.
-
-## TODO
-
-- port remaining options from `postcss-smart-asset` and `rollup-plugin-url`
 
 ## Contribution
 

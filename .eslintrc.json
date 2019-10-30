@@ -1,7 +1,7 @@
 {
-  "extends": "eslint:recommended",
+  "extends": "standard",
   "parserOptions": {
-    "ecmaVersion": 2017,
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "env": {
@@ -10,9 +10,12 @@
     "node": true
   },
   "rules": {
-    "no-tabs": "error",
-    "semi": ["error", "never"],
     "quotes": ["error", "double"],
-    "comma-dangle": ["error", "always-multiline"]
+    "space-before-function-paren": ["error", {
+      "anonymous": "always",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "no-multi-spaces": ["error", { "ignoreEOLComments": true }]
   }
 }
