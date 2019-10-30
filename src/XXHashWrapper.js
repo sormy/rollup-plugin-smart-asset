@@ -14,7 +14,11 @@ export class XXHashWrapper {
       throw new Error("Unable to find xxhash module")
     }
 
-    const XXHash = size >= 64 ? xxhash.XXHash64 : xxhash
+    if (size !== 64 && size !== 32) {
+      throw new Error(`Invalid xxhash size: ${size}`)
+    }
+
+    const XXHash = size === 64 ? xxhash.XXHash64 : xxhash
 
     this.hasher = new XXHash(seed)
   }

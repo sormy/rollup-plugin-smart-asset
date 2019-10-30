@@ -13,7 +13,11 @@ export class MetroHashWrapper {
       throw new Error("Unable to find metrohash module")
     }
 
-    const MetroHash = size >= 128 ? metrohash.MetroHash128 : metrohash.MetroHash64
+    if (size !== 128 && size !== 64) {
+      throw new Error(`Invalid metrohash size: ${size}`)
+    }
+
+    const MetroHash = size === 128 ? metrohash.MetroHash128 : metrohash.MetroHash64
 
     this.hasher = new MetroHash()
   }
