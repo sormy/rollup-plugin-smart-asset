@@ -101,6 +101,7 @@ Options:
 - `publicPath`: Reference file from JS using this path, relative to html page
   where asset is referenced. Could be relative, absolute or CDN.
 - `assetsPath`: Copy assets to this directory, relative to rollup output.
+- `moduleBasePath`: Useful when using module output from rollup (no bundle). Specify the root folder of your modules (usually /src or similar).
 - `useHash`: Use `[hash][ext]` instead of default `[name][ext]`.
 - `keepName`: Use both hash and name `[name]~[hash][ext]` if `useHash` is `true`.
 - `nameFormat`: Use custom name format using these patterns `[name]`, `[ext]`,

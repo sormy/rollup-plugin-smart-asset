@@ -22,8 +22,8 @@ function getPublicPathPrefix(publicPath) {
     : ""
 }
 
-function getImportPathPrefix(assetsPath) {
-  return "." + (assetsPath ? "/" + assetsPath : "") + "/"
+function getImportPathPrefix(assetsPath, relativePre) {
+  return (relativePre || ".") + (assetsPath ? "/" + assetsPath : "") + "/"
 }
 
 async function getAssetName(fileName, opts) {
@@ -60,22 +60,23 @@ async function detectOpMode(fileName, options) {
 
 export default (initialOptions = {}) => {
   const defaultOptions = {
-    url: "rebase",        // mode: "rebase" | "inline" | "copy"
-    rebasePath: ".",      // rebase all asset urls to this directory
-    maxSize: 14,          // max size in kbytes that will be inlined, fallback is copy
-    publicPath: null,     // relative to html page where asset is referenced
-    assetsPath: null,     // relative to rollup output
-    useHash: false,       // alias for nameFormat: [hash][ext]
-    keepName: false,      // alias for nameFormat: [name]~[hash][ext] (requires useHash)
-    nameFormat: null,     // valid patterns: [name] | [ext] | [hash]
-    hashOptions: {        // hash options:
-      hash: "sha1",       // "sha1", "md5", "metrohash128", "xxhash64" etc or Hash-like class
-      encoding: "base52", // "hex", "base64", "base62", "base58", "base52" etc
-      maxLength: 8        // truncate final digest to specific length
+    url: "rebase",          // mode: "rebase" | "inline" | "copy"
+    rebasePath: ".",        // rebase all asset urls to this directory
+    maxSize: 14,            // max size in kbytes that will be inlined, fallback is copy
+    publicPath: null,       // relative to html page where asset is referenced
+    assetsPath: null,       // relative to rollup output
+    moduleBasePath: null,   // relative to rollup conf
+    useHash: false,         // alias for nameFormat: [hash][ext]
+    keepName: false,        // alias for nameFormat: [name]~[hash][ext] (requires useHash)
+    nameFormat: null,       // valid patterns: [name] | [ext] | [hash]
+    hashOptions: {          // hash options:
+      hash: "sha1",         // "sha1", "md5", "metrohash128", "xxhash64" etc or Hash-like class
+      encoding: "base52",   // "hex", "base64", "base62", "base58", "base52" etc
+      maxLength: 8          // truncate final digest to specific length
     },
-    keepImport: false,    // keeps import to let another bundler to process the import
-    sourceMap: false,     // add source map if transform() hook is invoked
-    extensions: [         // list of extensions to process by this plugin
+    keepImport: false,      // keeps import to let another bundler to process the import
+    sourceMap: false,       // add source map if transform() hook is invoked
+    extensions: [           // list of extensions to process by this plugin
       ".svg",
       ".gif",
       ".png",
@@ -113,8 +114,9 @@ export default (initialOptions = {}) => {
         } else if (mode === "copy") {
           const assetName = await getAssetName(id, options)
           assetsToCopy.push({ assetName: assetName, fileName: id })
+          const moduleBaseRelative = options.moduleBasePath ? relative(dirname(id), options.moduleBasePath) : ""
           value = options.keepImport
-            ? getImportPathPrefix(options.assetsPath) + assetName
+            ? getImportPathPrefix(options.assetsPath, moduleBaseRelative.replace(/\\/g, "/")) + assetName
             : getPublicPathPrefix(options.publicPath) + assetName
         } else if (mode === "rebase") {
           const assetName = relative(options.rebasePath, id)

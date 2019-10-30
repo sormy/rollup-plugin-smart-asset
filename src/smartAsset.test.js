@@ -113,6 +113,13 @@ describe("smartAsset()", () => {
     expect(result).toEqual(`${idComment}\nexport default require("./assets/test.png")`)
   })
 
+  test("load(), copy mode with keepImport with assetsPath with moduleBasePath, returns relative asset path as exports", async () => {
+    const options = { url: "copy", keepImport: true, extensions: [".png"], assetsPath: "assets", moduleBasePath: "src/" }
+    const result = await smartAsset(options).load("src/components/atoms/testComponent/test.png")
+
+    expect(result).toEqual(`${idComment}\nexport default require("../../../assets/test.png")`)
+  })
+
   test("load(), copy mode, uses publicPath (no ending slash)", async () => {
     const options = { url: "copy", extensions: [".png"], publicPath: "assets" }
     const result = await smartAsset(options).load("test.png")
