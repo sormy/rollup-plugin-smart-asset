@@ -58,6 +58,13 @@ async function detectOpMode(fileName, options) {
   return options.url
 }
 
+async function readFileAsDataURL(fileName) {
+  const content = await readFileAsync(fileName)
+  const base64 = content.toString("base64")
+  const mime = getType(fileName)
+  return `data:${mime};base64,${base64}`
+}
+
 export default (initialOptions = {}) => {
   const defaultOptions = {
     url: "rebase",        // mode: "rebase" | "inline" | "copy"
@@ -106,10 +113,7 @@ export default (initialOptions = {}) => {
         let value
 
         if (mode === "inline") {
-          const content = await readFileAsync(id)
-          const base64 = content.toString("base64")
-          const mime = getType(id)
-          value = `data:${mime};base64,${base64}`
+          value = await readFileAsDataURL(id)
         } else if (mode === "copy") {
           const assetName = await getAssetName(id, options)
           assetsToCopy.push({ assetName: assetName, fileName: id })
