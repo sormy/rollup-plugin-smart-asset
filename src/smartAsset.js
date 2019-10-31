@@ -101,7 +101,7 @@ export default (initialOptions = {}) => {
 
   const idComment = "/* loaded by smart-asset */"
 
-  let assetsToCopy = []
+  const assetsToCopy = []
 
   const plugin = {
     name: "smart-asset",
@@ -192,7 +192,7 @@ export default (initialOptions = {}) => {
           }
         }
 
-        assetsToCopy = []
+        assetsToCopy.length = 0
       }
     }
   }
