@@ -113,6 +113,21 @@ describe("smartAsset()", () => {
     expect(result).toEqual(`${idComment}\nexport default require("./assets/test.png")`)
   })
 
+  test("load(), copy mode with keepImport and preserveModules", async () => {
+    const options = {
+      url: "copy",
+      preserveModules: true,
+      keepImport: true,
+      extensions: [".png"],
+      assetsPath: "../public/assets",
+      inputFile: "src/index.ts",
+      outputDir: "dist/cjs"
+    }
+    const result = await smartAsset(options).load("src/assets/test.png")
+
+    expect(result).toEqual(`${idComment}\nexport default require("../../public/assets/test.png")`)
+  })
+
   test("load(), copy mode, uses publicPath (no ending slash)", async () => {
     const options = { url: "copy", extensions: [".png"], publicPath: "assets" }
     const result = await smartAsset(options).load("test.png")

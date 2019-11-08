@@ -118,6 +118,21 @@ Options:
 - `keepImport`: Keep import, so consumer of your package could define their own
   bundle configuration.
 
+**Preserve Modules**
+
+Rollup `preserveModules: true` is supported but additional context is required
+for the plugin to properly detect rebased path to the asset.
+
+Additional options needed:
+
+- `preserveModules`: Set to `true` to activate mode, can be automatically
+  detected if Rollup supports `buildStart` hook.
+- `inputFile`: Path to main entry, should be the same as `input.file`, can be
+  automatically detected if Rollup supports `buildStart` hook. Object and
+  array values for `input.file` are not supported.
+- `outputDir`: Path to output dir, should be the same as `output.dir`, can't be
+  automaticall detected and neeed to be explicitly passed.
+
 ## Migration
 
 ### Migration from v1.x to v2.x

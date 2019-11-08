@@ -1,6 +1,6 @@
 import { promisify } from "util"
 import { stat, readFile, copyFileSync } from "fs"
-import { join, extname, dirname, parse, relative } from "path"
+import { join, extname, dirname, parse, relative, posix } from "path"
 
 import { sync as mkdirpSync } from "mkdirp"
 import { getType } from "mime"
@@ -11,78 +11,111 @@ import { hashFile } from "./hashFile"
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
 
-function moduleMatchesExtList(fileName, extensions) {
-  const ext = extname(fileName)
+function markRelative(path) {
+  if (path.substr(0, 3) === "../" || path.substr(0, 2) === "./" || path.substr(0, 1) === "/") {
+    return path
+  }
+  return "./" + path
+}
+
+function moduleMatchesExtList(filename, extensions) {
+  const ext = extname(filename)
   return extensions.indexOf(ext) !== -1
 }
 
-function getPublicPathPrefix(publicPath) {
-  return publicPath
-    ? (publicPath.substr(-1) === "/" ? publicPath : publicPath + "/")
-    : ""
+function getAssetPublicPath(assetName, publicPath) {
+  return publicPath ? posix.join(publicPath, assetName) : assetName
 }
 
-function getImportPathPrefix(assetsPath) {
-  return "." + (assetsPath ? "/" + assetsPath : "") + "/"
+function getAssetImportPath(assetName, assetsPath, context = {}) {
+  if (context.preserveModules) {
+    const wrapperFile = join(context.outputDir, relative(dirname(context.inputFile), context.moduleId + ".js"))
+    const assetFile = join(context.outputDir, getAssetImportPath(assetName, assetsPath))
+    const assetRel = relative(dirname(wrapperFile), assetFile)
+    return markRelative(posix.normalize(assetRel))
+  }
+  return markRelative(assetsPath ? posix.join(assetsPath, assetName) : assetName)
 }
 
-async function getAssetName(fileName, opts) {
-  const modulePath = parse(fileName)
+async function getAssetName(filename, opts) {
+  const parsedPath = parse(filename)
 
   const hash = (opts.nameFormat && /\[hash\]/.test(opts.nameFormat)) || opts.useHash
-    ? await hashFile(fileName, opts.hashOptions.hash, opts.hashOptions.encoding,
+    ? await hashFile(filename, opts.hashOptions.hash, opts.hashOptions.encoding,
       opts.hashOptions.maxLength)
     : ""
 
   if (opts.nameFormat) {
     return opts.nameFormat
-      .replace(/\[name\]/g, modulePath.name)
-      .replace(/\[ext\]/g, modulePath.ext)
+      .replace(/\[name\]/g, parsedPath.name)
+      .replace(/\[ext\]/g, parsedPath.ext)
       .replace(/\[hash\]/g, hash)
   }
 
   if (opts.useHash) {
     return opts.keepName
-      ? modulePath.name + "~" + hash + modulePath.ext
-      : hash + modulePath.ext
+      ? parsedPath.name + "~" + hash + parsedPath.ext
+      : hash + parsedPath.ext
   }
 
-  return modulePath.name + modulePath.ext
+  return parsedPath.name + parsedPath.ext
 }
 
-async function detectOpMode(fileName, options) {
+function validateOptions(options) {
+  if (options.preserveModules) {
+    if (!options.outputDir) {
+      throw new Error("Unable to detect asset import path without outputDir provided (should be the same as output.dir)")
+    }
+    if (typeof options.outputDir !== "string") {
+      throw new Error("Option outputDir must be a string (should be the same as output.dir)")
+    }
+    if (!options.inputFile) {
+      throw new Error("Unable to detect asset import path without inputFile provided (should be the same as input.file)")
+    }
+    if (typeof options.inputFile !== "string") {
+      throw new Error("Option inputFile must be a string (should be the same as input.file)")
+    }
+  }
+  // TODO: add checks for other options
+}
+
+async function detectOpMode(filename, options) {
   if (options.url === "inline" && options.maxSize) {
-    const stat = await statAsync(fileName)
+    const stat = await statAsync(filename)
     return stat.size <= options.maxSize * 1024 ? "inline" : "copy"
   }
   return options.url
 }
 
-async function readFileAsDataURL(fileName) {
-  const content = await readFileAsync(fileName)
-  const base64 = content.toString("base64")
-  const mime = getType(fileName)
+async function readFileAsDataURL(filename) {
+  const buffer = await readFileAsync(filename)
+  const base64 = buffer.toString("base64")
+  const mime = getType(filename)
   return `data:${mime};base64,${base64}`
 }
 
 export default (initialOptions = {}) => {
   const defaultOptions = {
-    url: "rebase",        // mode: "rebase" | "inline" | "copy"
-    rebasePath: ".",      // rebase all asset urls to this directory
-    maxSize: 14,          // max size in kbytes that will be inlined, fallback is copy
-    publicPath: null,     // relative to html page where asset is referenced
-    assetsPath: null,     // relative to rollup output
-    useHash: false,       // alias for nameFormat: [hash][ext]
-    keepName: false,      // alias for nameFormat: [name]~[hash][ext] (requires useHash)
-    nameFormat: null,     // valid patterns: [name] | [ext] | [hash]
-    hashOptions: {        // hash options:
-      hash: "sha1",       // "sha1", "md5", "metrohash128", "xxhash64" etc or Hash-like class
-      encoding: "base52", // "hex", "base64", "base62", "base58", "base52" etc
-      maxLength: 8        // truncate final digest to specific length
+    url: "rebase",            // mode: "rebase" | "inline" | "copy"
+    rebasePath: ".",          // rebase all asset urls to this directory
+    maxSize: 14,              // max size in kbytes that will be inlined, fallback is copy
+    publicPath: null,         // relative to html page where asset is referenced
+    assetsPath: null,         // relative to rollup output
+    preserveModules: false,   // should be the same as rollup's preserveModules
+    outputDir: null,          // should be the same as output.dir value if preserveModules is set
+    inputFile: null,          // should be the same as input.file value if preserveModules is set
+    useHash: false,           // alias for nameFormat: [hash][ext]
+    keepName: false,          // alias for nameFormat: [name]~[hash][ext] (requires useHash)
+    nameFormat: null,         // valid patterns: [name] | [ext] | [hash]
+    hashOptions: {            // hash options:
+      hash: "sha1",           // "sha1", "md5", "metrohash128", "xxhash64" etc or Hash-like class
+      encoding: "base52",     // "hex", "base64", "base62", "base58", "base52" etc
+      maxLength: 8            // truncate final digest to specific length
     },
-    keepImport: false,    // keeps import to let another bundler to process the import
-    sourceMap: false,     // add source map if transform() hook is invoked
-    extensions: [         // list of extensions to process by this plugin
+    keepImport: false,        // keeps import to let another bundler to process the import
+    sourceMap: false,         // add source map if transform() hook is invoked
+    sourcemap: false,         // alias for sourceMap
+    extensions: [             // list of extensions to process by this plugin
       ".svg",
       ".gif",
       ".png",
@@ -106,6 +139,19 @@ export default (initialOptions = {}) => {
   const plugin = {
     name: "smart-asset",
 
+    buildStart(inputOptions) {
+      if (inputOptions.preserveModules) {
+        options.preserveModules = inputOptions.preserveModules
+      }
+
+      // autodetect inputFile based on rollup input options if rollup supports that
+      if (!options.inputFile) {
+        options.inputFile = inputOptions.input
+      }
+
+      validateOptions(options)
+    },
+
     async load(id) {
       if (moduleMatchesExtList(id, options.extensions)) {
         const mode = await detectOpMode(id, options)
@@ -116,15 +162,22 @@ export default (initialOptions = {}) => {
           value = await readFileAsDataURL(id)
         } else if (mode === "copy") {
           const assetName = await getAssetName(id, options)
-          assetsToCopy.push({ assetName: assetName, fileName: id })
-          value = options.keepImport
-            ? getImportPathPrefix(options.assetsPath) + assetName
-            : getPublicPathPrefix(options.publicPath) + assetName
+          assetsToCopy.push({ assetName, filename: id })
+          if (options.keepImport) {
+            value = getAssetImportPath(assetName, options.assetsPath, {
+              moduleId: id,
+              preserveModules: options.preserveModules,
+              outputDir: options.outputDir,
+              inputFile: options.inputFile
+            })
+          } else {
+            value = getAssetPublicPath(assetName, options.publicPath)
+          }
         } else if (mode === "rebase") {
-          const assetName = relative(options.rebasePath, id)
+          const assetName = posix.relative(options.rebasePath, id)
           value = options.keepImport
-            ? "./" + assetName
-            : getPublicPathPrefix(options.publicPath) + assetName
+            ? getAssetImportPath(assetName)
+            : getAssetPublicPath(assetName, options.publicPath)
         } else {
           this.warn(`Invalid mode: ${mode}`)
           return
@@ -138,7 +191,7 @@ export default (initialOptions = {}) => {
       }
     },
 
-    // some plugins could load asset content before this plugin's load() hook
+    // some plugins could load asset content, so plugin's load() hook
     // will never be executed, but transform() hook works even in that case
     async transform(code, id) {
       const alreadyProcessed = code.startsWith(idComment)
@@ -147,7 +200,7 @@ export default (initialOptions = {}) => {
         const newCode = await plugin.load.call(this, id)
 
         if (newCode) {
-          if (options.sourceMap) {
+          if (options.sourceMap || options.sourcemap) {
             const magicString = new MagicString(code)
             magicString.overwrite(0, code.length - 1, newCode)
             return {
@@ -186,9 +239,9 @@ export default (initialOptions = {}) => {
           }
 
           try {
-            copyFileSync(asset.fileName, assetPath)
+            copyFileSync(asset.filename, assetPath)
           } catch (e) {
-            this.warn(`Unable to copy asset: ${asset.fileName}`)
+            this.warn(`Unable to copy asset: ${asset.filename}`)
           }
         }
 
