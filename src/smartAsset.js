@@ -1,6 +1,6 @@
 import { promisify } from "util"
 import { stat, readFile, copyFileSync } from "fs"
-import { join, extname, dirname, parse, relative, posix } from "path"
+import { join, extname, dirname, parse, relative, normalize } from "path"
 
 import { sync as mkdirpSync } from "mkdirp"
 import { getType } from "mime"
@@ -10,6 +10,11 @@ import { hashFile } from "./hashFile"
 
 const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
+
+// replace windows paths to unix paths on windows platform
+function slash(path) {
+  return path.replace(/\\/g, "/")
+}
 
 function markRelative(path) {
   if (path.substr(0, 3) === "../" || path.substr(0, 2) === "./" || path.substr(0, 1) === "/") {
@@ -24,7 +29,7 @@ function moduleMatchesExtList(filename, extensions) {
 }
 
 function getAssetPublicPath(assetName, publicPath) {
-  return publicPath ? posix.join(publicPath, assetName) : assetName
+  return slash(publicPath ? join(publicPath, assetName) : assetName)
 }
 
 function getAssetImportPath(assetName, assetsPath, context = {}) {
@@ -32,9 +37,9 @@ function getAssetImportPath(assetName, assetsPath, context = {}) {
     const wrapperFile = join(context.outputDir, relative(dirname(context.inputFile), context.moduleId + ".js"))
     const assetFile = join(context.outputDir, getAssetImportPath(assetName, assetsPath))
     const assetRel = relative(dirname(wrapperFile), assetFile)
-    return markRelative(posix.normalize(assetRel))
+    return markRelative(slash(normalize(assetRel)))
   }
-  return markRelative(assetsPath ? posix.join(assetsPath, assetName) : assetName)
+  return markRelative(slash(assetsPath ? join(assetsPath, assetName) : assetName))
 }
 
 async function getAssetName(filename, opts) {
@@ -174,7 +179,7 @@ export default (initialOptions = {}) => {
             value = getAssetPublicPath(assetName, options.publicPath)
           }
         } else if (mode === "rebase") {
-          const assetName = posix.relative(options.rebasePath, id)
+          const assetName = relative(options.rebasePath, id)
           value = options.keepImport
             ? getAssetImportPath(assetName)
             : getAssetPublicPath(assetName, options.publicPath)
