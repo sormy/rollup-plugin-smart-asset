@@ -148,7 +148,7 @@ export default (initialOptions = {}) => {
 
   const assetsToCopy = []
 
-  const filter = createFilter(options.include, options.exclude, { resolve: false })
+  const filter = createFilter(options.include, options.exclude)
 
   const plugin = {
     name: "smart-asset",
