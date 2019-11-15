@@ -14,6 +14,17 @@ jest.mock("fs")
 jest.mock("mkdirp")
 jest.mock("./hashFile")
 
+// tests are operating with virtual modules here so `resolve` need to be disabled
+// to make tests work correctly
+jest.mock("rollup-pluginutils", () => {
+  const { createFilter } = jest.requireActual("rollup-pluginutils")
+  return {
+    createFilter(include, exclude) {
+      return createFilter(include, exclude, { resolve: false })
+    }
+  }
+})
+
 const idComment = "/* loaded by smart-asset */"
 
 describe("smartAsset()", () => {
@@ -33,6 +44,35 @@ describe("smartAsset()", () => {
 
     const oggResult = await smartAsset(options).load("test.gif")
     expect(oggResult).not.toBe(undefined)
+  })
+
+  test("load() runs for any file if extensions is empty", async () => {
+    const options = { extensions: [] }
+
+    const jsResult = await smartAsset(options).load("test.js")
+    expect(jsResult).not.toBe(undefined)
+
+    const pngResult = await smartAsset(options).load("test.png")
+    expect(pngResult).not.toBe(undefined)
+
+    const oggResult = await smartAsset(options).load("test.gif")
+    expect(oggResult).not.toBe(undefined)
+  })
+
+  test("load() runs using include/exclude micromatch", async () => {
+    const options = { include: "*.js", exclude: "*.esm.js" }
+
+    const jsResult1 = await smartAsset(options).load("test123.js")
+    expect(jsResult1).not.toBe(undefined)
+
+    const jsResult2 = await smartAsset(options).load("test.esm.js")
+    expect(jsResult2).toBe(undefined)
+
+    const pngResult = await smartAsset(options).load("test.png")
+    expect(pngResult).toBe(undefined)
+
+    const oggResult = await smartAsset(options).load("test.gif")
+    expect(oggResult).toBe(undefined)
   })
 
   test("load(), rebase mode, returns rebased url as exports", async () => {

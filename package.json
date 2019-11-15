@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "keywords": [
     "rollup-plugin",
@@ -38,7 +38,8 @@
     "big.js": "^5.2.2",
     "magic-string": "^0.25.2",
     "mime": "^2.4.4",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "rollup-pluginutils": "^2.8.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

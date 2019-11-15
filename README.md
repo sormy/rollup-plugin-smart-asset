@@ -41,7 +41,15 @@ Main options:
 
 - `url`: Mode: `rebase` (default), `inline` and `copy`
 - `extensions`: What file extensions to process, defaults to
-  `[".svg", ".gif", ".png", ".jpg"]`
+  `[".svg", ".gif", ".png", ".jpg"]` unless `exclude` or `include` are used.
+  This option is ignored if `include` or `exclude` options are used.
+- `include`: Micromatch pattern or array of micromatch patterns for files that
+  need to be processed by this plugin.
+- `exclude`: Micromatch pattern or array of micromatch patterns for files that
+  NOT need to be processed by this plugin.
+
+For more details about `include` / `exclude` syntax please refer to:
+<https://github.com/micromatch/micromatch>
 
 ## Mode: rebase
 
@@ -131,7 +139,7 @@ Additional options needed:
   automatically detected if Rollup supports `buildStart` hook. Object and
   array values for `input.file` are not supported.
 - `outputDir`: Path to output dir, should be the same as `output.dir`, can't be
-  automaticall detected and neeed to be explicitly passed.
+  automatically detected and neeed to be explicitly passed.
 
 ## Migration
 

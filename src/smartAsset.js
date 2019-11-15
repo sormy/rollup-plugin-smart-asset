@@ -2,6 +2,7 @@ import { promisify } from "util"
 import { stat, readFile, copyFileSync } from "fs"
 import { join, extname, dirname, parse, relative, normalize } from "path"
 
+import { createFilter } from "rollup-pluginutils"
 import { sync as mkdirpSync } from "mkdirp"
 import { getType } from "mime"
 import MagicString from "magic-string"
@@ -24,8 +25,7 @@ function markRelative(path) {
 }
 
 function moduleMatchesExtList(filename, extensions) {
-  const ext = extname(filename)
-  return extensions.indexOf(ext) !== -1
+  return extensions.length ? extensions.indexOf(extname(filename)) !== -1 : true
 }
 
 function getAssetPublicPath(assetName, publicPath) {
@@ -120,6 +120,8 @@ export default (initialOptions = {}) => {
     keepImport: false,        // keeps import to let another bundler to process the import
     sourceMap: false,         // add source map if transform() hook is invoked
     sourcemap: false,         // alias for sourceMap
+    include: undefined,       // micromatch or array if micromatch patterns relative to process.cwd()
+    exclude: undefined,       // micromatch or array if micromatch patterns relative to process.cwd()
     extensions: [             // list of extensions to process by this plugin
       ".svg",
       ".gif",
@@ -137,9 +139,16 @@ export default (initialOptions = {}) => {
     }
   }
 
+  // unset default extensions of include/exclude are used
+  if (options.include || options.exclude) {
+    options.extensions = []
+  }
+
   const idComment = "/* loaded by smart-asset */"
 
   const assetsToCopy = []
+
+  const filter = createFilter(options.include, options.exclude, { resolve: false })
 
   const plugin = {
     name: "smart-asset",
@@ -158,42 +167,44 @@ export default (initialOptions = {}) => {
     },
 
     async load(id) {
-      if (moduleMatchesExtList(id, options.extensions)) {
-        const mode = await detectOpMode(id, options)
-
-        let value
-
-        if (mode === "inline") {
-          value = await readFileAsDataURL(id)
-        } else if (mode === "copy") {
-          const assetName = await getAssetName(id, options)
-          assetsToCopy.push({ assetName, filename: id })
-          if (options.keepImport) {
-            value = getAssetImportPath(assetName, options.assetsPath, {
-              moduleId: id,
-              preserveModules: options.preserveModules,
-              outputDir: options.outputDir,
-              inputFile: options.inputFile
-            })
-          } else {
-            value = getAssetPublicPath(assetName, options.publicPath)
-          }
-        } else if (mode === "rebase") {
-          const assetName = relative(options.rebasePath, id)
-          value = options.keepImport
-            ? getAssetImportPath(assetName)
-            : getAssetPublicPath(assetName, options.publicPath)
-        } else {
-          this.warn(`Invalid mode: ${mode}`)
-          return
-        }
-
-        const code = options.keepImport && (mode === "copy" || mode === "rebase")
-          ? `${idComment}\nexport default require(${JSON.stringify(value)})`
-          : `${idComment}\nexport default ${JSON.stringify(value)}`
-
-        return code
+      if (!moduleMatchesExtList(id, options.extensions) || !filter(id)) {
+        return
       }
+
+      const mode = await detectOpMode(id, options)
+
+      let value
+
+      if (mode === "inline") {
+        value = await readFileAsDataURL(id)
+      } else if (mode === "copy") {
+        const assetName = await getAssetName(id, options)
+        assetsToCopy.push({ assetName, filename: id })
+        if (options.keepImport) {
+          value = getAssetImportPath(assetName, options.assetsPath, {
+            moduleId: id,
+            preserveModules: options.preserveModules,
+            outputDir: options.outputDir,
+            inputFile: options.inputFile
+          })
+        } else {
+          value = getAssetPublicPath(assetName, options.publicPath)
+        }
+      } else if (mode === "rebase") {
+        const assetName = relative(options.rebasePath, id)
+        value = options.keepImport
+          ? getAssetImportPath(assetName)
+          : getAssetPublicPath(assetName, options.publicPath)
+      } else {
+        this.warn(`Invalid mode: ${mode}`)
+        return
+      }
+
+      const code = options.keepImport && (mode === "copy" || mode === "rebase")
+        ? `${idComment}\nexport default require(${JSON.stringify(value)})`
+        : `${idComment}\nexport default ${JSON.stringify(value)}`
+
+      return code
     },
 
     // some plugins could load asset content, so plugin's load() hook
