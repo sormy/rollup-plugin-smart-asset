@@ -273,7 +273,6 @@ describe("smartAsset()", () => {
     await plugin.load("test1.png")
     await plugin.load("test2.png")
     plugin.generateBundle(outputOptions, {}, true)
-    plugin.generateBundle(outputOptions, {}, true) // should be ignored
 
     expect(mkdirpSyncMock).toBeCalledTimes(1)
     expect(mkdirpSyncMock).toBeCalledWith("dist")
@@ -292,7 +291,6 @@ describe("smartAsset()", () => {
     await plugin.load("test1.png")
     await plugin.load("test2.png")
     plugin.generateBundle(outputOptions, {}, true)
-    plugin.generateBundle(outputOptions, {}, true) // should be ignored
 
     expect(mkdirpSyncMock).toBeCalledTimes(1)
     expect(mkdirpSyncMock).toBeCalledWith("dist")
@@ -356,5 +354,42 @@ describe("smartAsset()", () => {
     plugin.generateBundle(outputOptions, {}, true)
 
     expect(plugin.warn).toBeCalled()
+  })
+
+  test("buildStart(), clears asset list from previous run", async () => {
+    mkdirpSyncMock.mockImplementation(() => {})
+
+    const options = { url: "copy", extensions: [".png"] }
+    const outputOptions1 = { file: "dist1/bundle.js" }
+    const outputOptions2 = { file: "dist2/bundle.js" }
+
+    const plugin = smartAsset(options)
+
+    plugin.warn = jest.fn()
+
+    await plugin.buildStart({})
+    await plugin.load("test1.png")
+    await plugin.load("test2.png")
+    plugin.generateBundle(outputOptions1, {}, true)
+    plugin.generateBundle(outputOptions2, {}, true)
+
+    expect(mkdirpSyncMock).toBeCalledTimes(2)
+    expect(mkdirpSyncMock).nthCalledWith(1, "dist1")
+    expect(mkdirpSyncMock).nthCalledWith(2, "dist2")
+
+    expect(copyFileSyncMock).toBeCalledTimes(4)
+    expect(copyFileSyncMock).nthCalledWith(1, "test1.png", "dist1/test1.png")
+    expect(copyFileSyncMock).nthCalledWith(2, "test2.png", "dist1/test2.png")
+    expect(copyFileSyncMock).nthCalledWith(3, "test1.png", "dist2/test1.png")
+    expect(copyFileSyncMock).nthCalledWith(4, "test2.png", "dist2/test2.png")
+
+    copyFileSyncMock.mockClear()
+
+    await plugin.buildStart({})
+    await plugin.load("test3.png")
+    plugin.generateBundle(outputOptions1, {}, true)
+
+    expect(copyFileSyncMock).toBeCalledTimes(1)
+    expect(copyFileSyncMock).nthCalledWith(1, "test3.png", "dist1/test3.png")
   })
 })

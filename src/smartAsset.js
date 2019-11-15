@@ -164,6 +164,9 @@ export default (initialOptions = {}) => {
       }
 
       validateOptions(options)
+
+      // clear assets from previous build cycle
+      assetsToCopy.length = 0
     },
 
     async load(id) {
@@ -260,8 +263,6 @@ export default (initialOptions = {}) => {
             this.warn(`Unable to copy asset: ${asset.filename}`)
           }
         }
-
-        assetsToCopy.length = 0
       }
     }
   }
