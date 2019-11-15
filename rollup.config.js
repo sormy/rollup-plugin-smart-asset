@@ -13,7 +13,8 @@ export default {
     "mkdirp",
     "mime",
     "magic-string",
-    "big.js"
+    "big.js",
+    "rollup-pluginutils"
   ],
   output: [
     { file: "dist/rollup-plugin-smart-asset.cjs.js", format: "cjs" },
