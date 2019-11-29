@@ -13,8 +13,12 @@ const statAsync = promisify(stat)
 const readFileAsync = promisify(readFile)
 
 // replace windows paths to unix paths on windows platform
-function slash(path) {
+function normalizeSlashes(path) {
   return path.replace(/\\/g, "/")
+}
+
+function addTrailingSlash(path) {
+  return path.endsWith("/") ? path : path + "/"
 }
 
 function markRelative(path) {
@@ -29,7 +33,8 @@ function moduleMatchesExtList(filename, extensions) {
 }
 
 function getAssetPublicPath(assetName, publicPath) {
-  return slash(publicPath ? join(publicPath, assetName) : assetName)
+  // standard path.join() corrupts protocol prefix "http://"
+  return publicPath ? addTrailingSlash(publicPath) + assetName : assetName
 }
 
 function getAssetImportPath(assetName, assetsPath, context = {}) {
@@ -37,9 +42,9 @@ function getAssetImportPath(assetName, assetsPath, context = {}) {
     const wrapperFile = join(context.outputDir, relative(dirname(context.inputFile), context.moduleId + ".js"))
     const assetFile = join(context.outputDir, getAssetImportPath(assetName, assetsPath))
     const assetRel = relative(dirname(wrapperFile), assetFile)
-    return markRelative(slash(normalize(assetRel)))
+    return markRelative(normalizeSlashes(normalize(assetRel)))
   }
-  return markRelative(slash(assetsPath ? join(assetsPath, assetName) : assetName))
+  return markRelative(normalizeSlashes(assetsPath ? join(assetsPath, assetName) : assetName))
 }
 
 async function getAssetName(filename, opts) {

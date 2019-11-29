@@ -182,6 +182,13 @@ describe("smartAsset()", () => {
     expect(result).toEqual(`${idComment}\nexport default "assets/test.png"`)
   })
 
+  test("load(), copy mode, uses publicPath (with absolute path)", async () => {
+    const options = { url: "copy", extensions: [".png"], publicPath: "http://cdn.domain.com/assets" }
+    const result = await smartAsset(options).load("test.png")
+
+    expect(result).toEqual(`${idComment}\nexport default "http://cdn.domain.com/assets/test.png"`)
+  })
+
   test("load(), copy mode, uses useHash", async () => {
     hashFileMock.mockReturnValueOnce("0123456789")
 
