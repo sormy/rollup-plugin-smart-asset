@@ -111,6 +111,7 @@ export default (initialOptions = {}) => {
     maxSize: 14,              // max size in kbytes that will be inlined, fallback is copy
     publicPath: null,         // relative to html page where asset is referenced
     assetsPath: null,         // relative to rollup output
+    emitFiles: true,
     preserveModules: false,   // should be the same as rollup's preserveModules
     outputDir: null,          // should be the same as output.dir value if preserveModules is set
     inputFile: null,          // should be the same as input.file value if preserveModules is set
@@ -242,7 +243,7 @@ export default (initialOptions = {}) => {
     },
 
     generateBundle(outputOptions, bundle, isWrite) {
-      if (isWrite && assetsToCopy.length) {
+      if (isWrite && assetsToCopy.length && options.emitFiles) {
         const outputDir = outputOptions.dir ? outputOptions.dir : dirname(outputOptions.file)
         const assetsRootPath = join(outputDir, options.assetsPath || "")
 

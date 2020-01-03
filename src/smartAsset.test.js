@@ -331,6 +331,18 @@ describe("smartAsset()", () => {
     expect(copyFileSyncMock).toBeCalledTimes(0)
   })
 
+  test("generateBundle(), copy mode, doesn't copy if emitFiles is false", async () => {
+    const options = { url: "copy", extensions: [".png"], emitFiles: false }
+    const outputOptions = { file: "dist/bundle.js" }
+
+    const plugin = smartAsset(options)
+
+    await plugin.load("test1.png")
+    plugin.generateBundle(outputOptions, {}, false)
+
+    expect(copyFileSyncMock).toBeCalledTimes(0)
+  })
+
   test("generateBundle(), copy mode, warn on copy error", async () => {
     copyFileSyncMock.mockImplementation(() => { throw new Error() })
 
