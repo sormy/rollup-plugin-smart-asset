@@ -47,7 +47,8 @@ Main options:
   need to be processed by this plugin.
 - `exclude`: Micromatch pattern or array of micromatch patterns for files that
   NOT need to be processed by this plugin.
-- `emitFiles`: Disable generating files if `false`, by default it's `true` - useful when generating bundle for SSR.
+- `emitFiles`: Disable generating files if `false`, by default it's `true` -
+  useful when generating bundle for SSR.
 
 For more details about `include` / `exclude` syntax please refer to:
 <https://github.com/micromatch/micromatch>
