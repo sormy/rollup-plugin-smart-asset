@@ -28,7 +28,7 @@ export default {
 ## Configuration
 
 For libraries it is recommended to use `inline` or `copy` mode with `keepImport`
-option to delegate bundling to consumer's package bundler. Asset hasing is not
+option to delegate bundling to consumer's package bundler. Asset hashing is not
 needed for this case and it is safe to set `useHash: false` and `keepName: true`.
 
 For applications it is also recommended to use `inline` or `copy` mode with
