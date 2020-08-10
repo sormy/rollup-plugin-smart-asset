@@ -82,11 +82,7 @@ function validateOptions(options) {
     if (!options.inputFile) {
       throw new Error("Unable to detect asset import path without inputFile provided (should be the same as input.file)")
     }
-    if (typeof options.inputFile !== "string") {
-      throw new Error("Option inputFile must be a string (should be the same as input.file)")
-    }
   }
-  // TODO: add checks for other options
 }
 
 async function detectOpMode(filename, options) {
@@ -102,6 +98,10 @@ async function readFileAsDataURL(filename) {
   const base64 = buffer.toString("base64")
   const mime = getType(filename)
   return `data:${mime};base64,${base64}`
+}
+
+function buildExportDefaultCode(modulePath, prefix = "") {
+  return `${prefix}\nexport default ${JSON.stringify(modulePath)}`
 }
 
 export default (initialOptions = {}) => {
@@ -166,13 +166,57 @@ export default (initialOptions = {}) => {
 
       // autodetect inputFile based on rollup input options if rollup supports that
       if (!options.inputFile) {
-        options.inputFile = inputOptions.input
+        const inputs = Array.isArray(inputOptions.input) ? inputOptions.input : [inputOptions.input]
+        options.inputFile = inputs.length === 1 ? inputs[0] : undefined
       }
 
       validateOptions(options)
 
       // clear assets from previous build cycle
       assetsToCopy.length = 0
+    },
+
+    async resolveId(source, importer) {
+      // fast path avoiding matchers and reading of source file in detectOpMode()
+      if (!options.keepImport) {
+        return
+      }
+
+      const id = importer ? join(dirname(importer), source) : source
+
+      if (!moduleMatchesExtList(id, options.extensions) || !filter(id)) {
+        return
+      }
+
+      const mode = await detectOpMode(id, options)
+
+      if (options.keepImport) {
+        switch (mode) {
+          case "inline": {
+            // noop
+            break
+          }
+          case "copy": {
+            const assetName = await getAssetName(id, options)
+            assetsToCopy.push({ assetName, filename: id })
+            const newAssetPath = getAssetImportPath(assetName, options.assetsPath, {
+              moduleId: id,
+              preserveModules: options.preserveModules,
+              outputDir: options.outputDir,
+              inputFile: options.inputFile
+            })
+            return { id: newAssetPath, external: true }
+          }
+          case "rebase": {
+            const assetName = relative(options.rebasePath, id)
+            const newAssetPath = getAssetImportPath(assetName)
+            return { id: newAssetPath, external: true }
+          }
+          default: {
+            this.warn(`Invalid mode: ${mode}`)
+          }
+        }
+      }
     },
 
     async load(id) {
@@ -182,38 +226,26 @@ export default (initialOptions = {}) => {
 
       const mode = await detectOpMode(id, options)
 
-      let value
-
-      if (mode === "inline") {
-        value = await readFileAsDataURL(id)
-      } else if (mode === "copy") {
-        const assetName = await getAssetName(id, options)
-        assetsToCopy.push({ assetName, filename: id })
-        if (options.keepImport) {
-          value = getAssetImportPath(assetName, options.assetsPath, {
-            moduleId: id,
-            preserveModules: options.preserveModules,
-            outputDir: options.outputDir,
-            inputFile: options.inputFile
-          })
-        } else {
-          value = getAssetPublicPath(assetName, options.publicPath)
+      switch (mode) {
+        case "inline": {
+          const newAssetPath = await readFileAsDataURL(id)
+          return buildExportDefaultCode(newAssetPath, idComment)
         }
-      } else if (mode === "rebase") {
-        const assetName = relative(options.rebasePath, id)
-        value = options.keepImport
-          ? getAssetImportPath(assetName)
-          : getAssetPublicPath(assetName, options.publicPath)
-      } else {
-        this.warn(`Invalid mode: ${mode}`)
-        return
+        case "copy": {
+          const assetName = await getAssetName(id, options)
+          assetsToCopy.push({ assetName, filename: id })
+          const newAssetPath = getAssetPublicPath(assetName, options.publicPath)
+          return buildExportDefaultCode(newAssetPath, idComment)
+        }
+        case "rebase": {
+          const assetName = relative(options.rebasePath, id)
+          const newAssetPath = getAssetPublicPath(assetName, options.publicPath)
+          return buildExportDefaultCode(newAssetPath, idComment)
+        }
+        default: {
+          this.warn(`Invalid mode: ${mode}`)
+        }
       }
-
-      const code = options.keepImport && (mode === "copy" || mode === "rebase")
-        ? `${idComment}\nexport default require(${JSON.stringify(value)})`
-        : `${idComment}\nexport default ${JSON.stringify(value)}`
-
-      return code
     },
 
     // some plugins could load asset content, so plugin's load() hook

@@ -1,9 +1,11 @@
-import babel from "rollup-plugin-babel"
+import babel from "@rollup/plugin-babel"
 
 export default {
   input: "src/smartAsset.js",
   plugins: [
-    babel()
+    babel({
+      babelHelpers: "bundled"
+    })
   ],
   external: [
     "util",
@@ -17,7 +19,15 @@ export default {
     "rollup-pluginutils"
   ],
   output: [
-    { file: "dist/rollup-plugin-smart-asset.cjs.js", format: "cjs" },
-    { file: "dist/rollup-plugin-smart-asset.esm.js", format: "esm" }
+    {
+      file: "dist/rollup-plugin-smart-asset.cjs.js",
+      format: "cjs",
+      exports: "auto"
+    },
+    {
+      file: "dist/rollup-plugin-smart-asset.esm.js",
+      format: "esm",
+      exports: "auto"
+    }
   ]
 }

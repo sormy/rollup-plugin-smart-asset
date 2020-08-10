@@ -60,10 +60,14 @@ Rebase asset references to be relative to specific directory.
 Output:
 
 ```js
-// without keepImport
+// without keepImport (inside wrapper)
 export default "public_path_to_asset"
-// with keepImport
-export default require("relative_path_to_asset_from_bundle")
+
+// with keepImport and cjs module format
+const myAsset = require("relative_path_to_asset_from_bundle")
+
+// with keepImport and esm module format
+import myAsset from "relative_path_to_asset_from_bundle"
 ```
 
 Options:
@@ -89,20 +93,26 @@ export default "data:{mimeType};base64,{data}"
 
 Options:
 
-- `maxSize`: Max file size to inline, fallback is `copy` mode, defaults to `14` kbytes.
+- `maxSize`: Max file size to inline (in kb), fallback is `copy` mode,
+  defaults to `14` kbytes.
 
 ## Mode: copy
 
-Copy asset to target directory and rebase original references to point to it
+Copy asset to target directory and rebase original references to point to target path
 depending on provided configuration.
 
 Output:
 
 ```js
-// without keepImport
+// without keepImport (inside wrapper)
 export default "public_path_to_asset"
-// with keepImport
-export default require("relative_path_to_asset_from_bundle")
+
+// with keepImport and cjs module format
+const myAsset = require("relative_path_to_asset_from_bundle")
+// + file is copied to target directory
+
+// with keepImport and esm module format
+import myAsset from "relative_path_to_asset_from_bundle"
 // + file is copied to target directory
 ```
 
@@ -111,7 +121,7 @@ Options:
 - `publicPath`: Reference file from JS using this path, relative to html page
   where asset is referenced. Could be relative, absolute or CDN.
 - `assetsPath`: Copy assets to this directory, relative to rollup output.
-- `useHash`: Use `[hash][ext]` instead of default `[name][ext]`.
+- `useHash`: Enable to use `[hash][ext]` instead of default `[name][ext]`.
 - `keepName`: Use both hash and name `[name]~[hash][ext]` if `useHash` is `true`.
 - `nameFormat`: Use custom name format using these patterns `[name]`, `[ext]`,
   `[hash]`.
@@ -167,27 +177,29 @@ or `xxhash64`.
 
 ## Alternatives
 
-## rollup-plugin-url
+## @rollup/plugin-url (ex rollup-plugin-url)
 
 <https://github.com/rollup/rollup-plugin-url>
+or
+<https://github.com/rollup/plugins/tree/master/packages/url>
 
-`rollup-plugin-url` has fewer options, doesn't work if asset is already loaded
+This Rollup plugin has fewer options, doesn't work if asset is already loaded
 by another plugin (by sourcemaps, for example) and doesn't have `keepImport`
-like option.
+like option (designed for applications).
 
 ## postcss-smart-asset
 
 <https://github.com/sebastian-software/postcss-smart-asset>
 
-`postcss-smart-asset` works for assets referenced from CSS, but doesn't work for
+This PostCSS plugin works for assets referenced from CSS, but doesn't work for
 assets imported from JavaScript.
 
 ## rollup-plugin-rebase
 
 <https://github.com/sebastian-software/rollup-plugin-rebase>
 
-`rollup-plugin-rebase` designed for libraries, not for applications. This plugin
-designed for all use cases.
+This Rollup plugin is designed for libraries, has `keepImport` like option
+enabled by default so can't be used for applications.
 
 ## Contribution
 

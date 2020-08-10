@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "keywords": [
     "rollup-plugin",
@@ -9,6 +9,9 @@
     "url",
     "copy",
     "inline"
+  ],
+  "files": [
+    "dist"
   ],
   "main": "dist/rollup-plugin-smart-asset.cjs.js",
   "jsnext:main": "dist/rollup-plugin-smart-asset.esm.js",
@@ -22,6 +25,7 @@
     "rollup": "rollup -c",
     "test": "npm run eslint && npm run jest",
     "build": "npm run rollup",
+    "build-examples": "find examples -name rollup.config.js -exec echo - Building example: {} \\; -execdir rollup -c \\;",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
@@ -36,27 +40,26 @@
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
     "big.js": "^5.2.2",
-    "magic-string": "^0.25.2",
-    "mime": "^2.4.4",
-    "mkdirp": "^0.5.1",
+    "magic-string": "^0.25.7",
+    "mime": "^2.4.6",
+    "mkdirp": "^1.0.4",
     "rollup-pluginutils": "^2.8.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/register": "^7.6.2",
-    "babel-jest": "^24.9.0",
-    "eslint": "^6.6.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0",
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
+    "@rollup/plugin-babel": "^5.1.0",
+    "eslint": "^7.6.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "jest": "^24.9.0",
+    "jest": "^26.2.2",
     "metrohash": "^2.6.0",
-    "rimraf": "^3.0.0",
-    "rollup": "^1.26.0",
-    "rollup-plugin-babel": "^4.3.3",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.23.1",
     "xxhash": "^0.3.0"
   },
   "peerDependencies": {

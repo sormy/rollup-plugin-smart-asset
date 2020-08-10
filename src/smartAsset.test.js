@@ -84,9 +84,9 @@ describe("smartAsset()", () => {
 
   test("load(), rebase mode with keepImport, returns rebased url as exports", async () => {
     const options = { url: "rebase", keepImport: true, extensions: [".png"] }
-    const result = await smartAsset(options).load("test.png")
+    const result = await smartAsset(options).resolveId("test.png")
 
-    expect(result).toEqual(`${idComment}\nexport default require("./test.png")`)
+    expect(result).toEqual({ external: true, id: "./test.png" })
   })
 
   test("load(), rebase mode, uses rebasePath", async () => {
@@ -98,9 +98,9 @@ describe("smartAsset()", () => {
 
   test("load(), rebase mode with keepImport, uses rebasePath", async () => {
     const options = { url: "rebase", keepImport: true, extensions: [".png"], rebasePath: "node_modules" }
-    const result = await smartAsset(options).load("node_modules/test/assets/test.png")
+    const result = await smartAsset(options).resolveId("node_modules/test/assets/test.png")
 
-    expect(result).toEqual(`${idComment}\nexport default require("./test/assets/test.png")`)
+    expect(result).toEqual({ external: true, id: "./test/assets/test.png" })
   })
   test("load(), rebase mode, uses publicPath", async () => {
     const options = { url: "rebase", extensions: [".png"], rebasePath: "node_modules", publicPath: "/vendor" }
@@ -141,16 +141,16 @@ describe("smartAsset()", () => {
 
   test("load(), copy mode with keepImport, returns asset name as exports", async () => {
     const options = { url: "copy", keepImport: true, extensions: [".png"] }
-    const result = await smartAsset(options).load("test.png")
+    const result = await smartAsset(options).resolveId("test.png")
 
-    expect(result).toEqual(`${idComment}\nexport default require("./test.png")`)
+    expect(result).toEqual({ external: true, id: "./test.png" })
   })
 
   test("load(), copy mode with keepImport with assetsPath, returns asset name as exports", async () => {
     const options = { url: "copy", keepImport: true, extensions: [".png"], assetsPath: "assets" }
-    const result = await smartAsset(options).load("test.png")
+    const result = await smartAsset(options).resolveId("test.png")
 
-    expect(result).toEqual(`${idComment}\nexport default require("./assets/test.png")`)
+    expect(result).toEqual({ external: true, id: "./assets/test.png" })
   })
 
   test("load(), copy mode with keepImport and preserveModules", async () => {
@@ -163,9 +163,9 @@ describe("smartAsset()", () => {
       inputFile: "src/index.ts",
       outputDir: "dist/cjs"
     }
-    const result = await smartAsset(options).load("src/assets/test.png")
+    const result = await smartAsset(options).resolveId("src/assets/test.png")
 
-    expect(result).toEqual(`${idComment}\nexport default require("../../public/assets/test.png")`)
+    expect(result).toEqual({ external: true, id: "../../public/assets/test.png" })
   })
 
   test("load(), copy mode, uses publicPath (no ending slash)", async () => {

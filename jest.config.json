@@ -1,0 +1,10 @@
+{
+  "testEnvironment": "node",
+  "clearMocks": true,
+  "collectCoverage": true,
+  "coverageReporters": [
+    "text",
+    "text-summary",
+    "lcov"
+  ]
+}
