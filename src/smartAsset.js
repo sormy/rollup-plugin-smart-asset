@@ -182,10 +182,6 @@ export default (initialOptions = {}) => {
         return
       }
 
-      /**
-       * @param {string} importer
-       * @param {string} source
-       */
       const createId = (importer, source) => isAbsolute(source) ? source : join(dirname(importer), source)
       const id = importer ? createId(importer, source) : source
 
