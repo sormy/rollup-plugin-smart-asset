@@ -1,6 +1,6 @@
 import { promisify } from "util"
 import { stat, readFile, copyFileSync } from "fs"
-import { join, extname, dirname, parse, relative, normalize } from "path"
+import { join, extname, dirname, parse, relative, normalize, isAbsolute } from "path"
 
 import { createFilter } from "rollup-pluginutils"
 import { sync as mkdirpSync } from "mkdirp"
@@ -182,7 +182,12 @@ export default (initialOptions = {}) => {
         return
       }
 
-      const id = importer ? join(dirname(importer), source) : source
+      /**
+       * @param {string} importer
+       * @param {string} source
+       */
+      const createId = (importer, source) => isAbsolute(source) ? source : join(dirname(importer), source)
+      const id = importer ? createId(importer, source) : source
 
       if (!moduleMatchesExtList(id, options.extensions) || !filter(id)) {
         return
