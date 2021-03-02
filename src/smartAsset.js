@@ -182,9 +182,7 @@ export default (initialOptions = {}) => {
         return
       }
 
-      const createId = (importer, source) => isAbsolute(source) ? source : join(dirname(importer), source)
-      const id = importer ? createId(importer, source) : source
-
+      const id = importer && !isAbsolute(source) ? join(dirname(importer), source) : source
       if (!moduleMatchesExtList(id, options.extensions) || !filter(id)) {
         return
       }
