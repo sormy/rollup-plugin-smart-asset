@@ -416,7 +416,7 @@ describe("smartAsset()", () => {
   describe("resolveId(),", () => {
     test("resolves absolute imports correctly", async () => {
       const relativeMock = jest.spyOn(path, "relative")
-      const source = "/home/user/code/project/test.png";
+      const source = "/home/user/code/project/test.png"
       const options = { url: "rebase", keepImport: true, extensions: [".png"] }
       await smartAsset(options).resolveId(
         source,

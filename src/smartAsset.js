@@ -183,6 +183,7 @@ export default (initialOptions = {}) => {
       }
 
       const id = importer && !isAbsolute(source) ? join(dirname(importer), source) : source
+
       if (!moduleMatchesExtList(id, options.extensions) || !filter(id)) {
         return
       }
