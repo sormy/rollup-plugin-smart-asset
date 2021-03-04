@@ -3,6 +3,7 @@ import {
   stat as statMock,
   copyFileSync as copyFileSyncMock
 } from "fs"
+import path from "path"
 
 import { hashFile as hashFileMock } from "./hashFile"
 
@@ -410,5 +411,22 @@ describe("smartAsset()", () => {
 
     expect(copyFileSyncMock).toBeCalledTimes(1)
     expect(copyFileSyncMock).nthCalledWith(1, "test3.png", "dist1/test3.png")
+  })
+
+  describe("resolveId(),", () => {
+    test("resolves absolute imports correctly", async () => {
+      const relativeMock = jest.spyOn(path, "relative")
+      const source = "/home/user/code/project/test.png"
+      const options = { url: "rebase", keepImport: true, extensions: [".png"] }
+      await smartAsset(options).resolveId(
+        source,
+        "/home/user/code/project/importer.js"
+      )
+
+      expect(relativeMock).toHaveBeenCalledTimes(1)
+      expect(relativeMock.mock.calls[0][1]).toBe(source)
+
+      relativeMock.mockRestore()
+    })
   })
 })
