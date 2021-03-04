@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-smart-asset",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Rollup plugin to rebase, inline or copy assets referenced from the code",
   "keywords": [
     "rollup-plugin",
@@ -39,27 +39,26 @@
   },
   "homepage": "https://github.com/sormy/rollup-plugin-smart-asset#readme",
   "dependencies": {
-    "big.js": "^5.2.2",
+    "big.js": "^6.0.3",
     "magic-string": "^0.25.7",
-    "mime": "^2.4.6",
+    "mime": "^2.5.2",
     "mkdirp": "^1.0.4",
     "rollup-pluginutils": "^2.8.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/preset-env": "^7.11.0",
-    "@babel/register": "^7.10.5",
-    "@rollup/plugin-babel": "^5.1.0",
-    "eslint": "^7.6.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.9",
+    "@babel/register": "^7.13.8",
+    "@rollup/plugin-babel": "^5.3.0",
+    "eslint": "^7.21.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "jest": "^26.2.2",
+    "eslint-plugin-promise": "^4.3.1",
+    "jest": "^26.6.3",
     "metrohash": "^2.6.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.23.1",
+    "rollup": "^2.40.0",
     "xxhash": "^0.3.0"
   },
   "peerDependencies": {
