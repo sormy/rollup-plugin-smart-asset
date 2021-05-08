@@ -21,6 +21,12 @@ function addTrailingSlash(path) {
   return path.endsWith("/") ? path : path + "/"
 }
 
+// wrappers (like the one produced by commonjs) have leading \0 and trailing query string
+// this function removes wrapper signature to get original path of module before it was wrapped
+function normalizeImporter(id) {
+  return id ? id.replace(/\?.*$/, "").replace(/^\0/, "") : undefined
+}
+
 function markRelative(path) {
   if (path.substr(0, 3) === "../" || path.substr(0, 2) === "./" || path.substr(0, 1) === "/") {
     return path
@@ -181,6 +187,8 @@ export default (initialOptions = {}) => {
       if (!options.keepImport) {
         return
       }
+
+      importer = normalizeImporter(importer)
 
       const id = importer && !isAbsolute(source) ? join(dirname(importer), source) : source
 
