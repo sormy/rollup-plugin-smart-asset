@@ -246,7 +246,7 @@ export default (initialOptions = {}) => {
           return buildExportDefaultCode(newAssetPath, idComment)
         }
         case "rebase": {
-          const assetName = relative(options.rebasePath, id)
+          const assetName = normalizeSlashes(relative(options.rebasePath, id));
           const newAssetPath = getAssetPublicPath(assetName, options.publicPath)
           return buildExportDefaultCode(newAssetPath, idComment)
         }
