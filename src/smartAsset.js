@@ -240,7 +240,7 @@ export default (initialOptions = {}) => {
           return buildExportDefaultCode(newAssetPath, idComment)
         }
         case "copy": {
-          const assetName = await getAssetName(id, options)
+          const assetName = normalizeSlashes(await getAssetName(id, options))
           assetsToCopy.push({ assetName, filename: id })
           const newAssetPath = getAssetPublicPath(assetName, options.publicPath)
           return buildExportDefaultCode(newAssetPath, idComment)
