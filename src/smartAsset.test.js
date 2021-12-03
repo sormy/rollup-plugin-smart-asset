@@ -156,19 +156,21 @@ describe("smartAsset()", () => {
       expect(result).toEqual({ external: true, id: "./assets/test.png" })
     })
 
-    test("in copy mode with keepImport and preserveModules", async () => {
+    test("in copy mode with keepImport and preserveModules and nested assets, final path works properly", async () => {
       const options = {
         url: "copy",
         preserveModules: true,
         keepImport: true,
-        extensions: [".png"],
-        assetsPath: "../public/assets",
-        inputFile: "src/index.ts",
-        outputDir: "dist/cjs"
+        assetsPath: "assets",
+        outputDir: "build",
+        inputFile: "src/index.ts"
       }
-      const result = await smartAsset(options).resolveId("src/assets/test.png")
+      const source = "./assets/test.png"
+      const importer = `${process.cwd()}/src/components/FancyComponent/FancyComponent.js`
 
-      expect(result).toEqual({ external: true, id: "../../public/assets/test.png" })
+      const result = await smartAsset(options).resolveId(source, importer)
+
+      expect(result).toEqual({ external: true, id: "../../assets/test.png" })
     })
 
     test("in copy mode, uses publicPath (no ending slash)", async () => {
