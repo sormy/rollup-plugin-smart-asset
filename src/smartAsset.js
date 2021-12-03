@@ -45,9 +45,9 @@ function getAssetPublicPath(assetName, publicPath) {
 
 function getAssetImportPath(assetName, assetsPath, context = {}) {
   if (context.preserveModules) {
-    const wrapperFile = join(context.outputDir, relative(dirname(context.inputFile), context.moduleId + ".js"))
+    const importingFile = join(context.outputDir, relative(dirname(context.inputFile), context.importer))
     const assetFile = join(context.outputDir, getAssetImportPath(assetName, assetsPath))
-    const assetRel = relative(dirname(wrapperFile), assetFile)
+    const assetRel = relative(dirname(importingFile), assetFile)
     return markRelative(normalizeSlashes(normalize(assetRel)))
   }
   return markRelative(normalizeSlashes(assetsPath ? join(assetsPath, assetName) : assetName))
@@ -209,6 +209,7 @@ export default (initialOptions = {}) => {
             assetsToCopy.push({ assetName, filename: id })
             const newAssetPath = getAssetImportPath(assetName, options.assetsPath, {
               moduleId: id,
+              importer: importer,
               preserveModules: options.preserveModules,
               outputDir: options.outputDir,
               inputFile: options.inputFile
